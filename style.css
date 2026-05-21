@@ -1,0 +1,150 @@
+@font-face {
+  font-family: 'LunaFont';
+  src: url('assets/fonts/Luna.ttf') format('truetype');
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url('assets/bg-totoro.jpg');
+  background-position: center;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.custom-title-font {
+  font-family: 'LunaFont', sans-serif;
+  color: #a3f7a3;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.ghibli-accordion {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: transparent;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.ghibli-panel {
+  border: none;
+  background-color: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.ghibli-panel:last-child {
+  border-bottom: none;
+}
+
+.accordion-header {
+  background-position: center;
+  background-size: cover;
+}
+
+#head-1 .accordion-button { background-image: url('assets/acc-bg1.png'); }
+#head-2 .accordion-button { background-image: url('assets/acc-bg2.png'); }
+#head-3 .accordion-button { background-image: url('assets/acc-bg3.png'); }
+#head-4 .accordion-button { background-image: url('assets/acc-bg4.png'); }
+#head-5 .accordion-button { background-image: url('assets/acc-bg5.png'); }
+
+.accordion-button {
+  padding: 20px;
+  font-family: 'LunaFont', sans-serif;
+  font-size: 1.5rem;
+  border: none;
+  color: #f5deb3 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  background-size: cover;
+  background-position: center;
+}
+
+.accordion-button::after {
+  filter: invert(1);
+}
+
+.accordion-button:not(.collapsed) {
+  color: #a3f7a3 !important;
+  background-color: transparent !important;
+}
+
+.ghibli-body {
+  padding: 20px;
+  color: #333;
+  background-color: #fdf5e6;
+}
+
+.custom-label {
+  color: #333;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.custom-input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.custom-input:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.ghibli-card {
+  border-radius: 5px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background-color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.card-active {
+  border: 4px solid #4caf50 !important;
+}
+
+.txt-desc {
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.action-btn {
+  padding: 10px 30px;
+  font-family: 'LunaFont', sans-serif;
+  font-size: 1.5rem;
+  color: #fff;
+  background-color: #2e8b57;
+  border: none;
+  border-radius: 10px;
+  transition: all 0.3s;
+}
+
+.action-btn:hover {
+  background-color: #1f6b40;
+  color: #fff;
+}
+
+.error-msg {
+  display: block;
+  margin-top: 0.25rem;
+  color: #a94442;
+  font-size: 0.85em;
+}
+
+.alert-pink {
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  color: #a94442;
+  font-size: 0.9rem;
+  background-color: #ffc0cb;
+  border-radius: 5px;
+}
+
+.summary-card {
+  border-radius: 10px;
+  background-color: #e8f5e9;
+}
+
+.summary-txt {
+  font-size: 0.9rem;
+}

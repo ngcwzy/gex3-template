@@ -2,36 +2,240 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Ghibli Park Itinerary Builder</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Bootstrap CSS -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-    rel="stylesheet">
-
-  <!-- Vue CDN -->
+  <title>Ghibli Park Itinerary Builder</title>
+  <!-- Bootstrap Framework -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <!-- Vue 3 Library -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-
-  <style>
-    
-
-  </style>
-  
 </head>
-
 <body>
-  
+  <div id="vue-app-container" class="container py-5">
+    <div class="text-center mb-4">
+      <h1 class="display-4 custom-title-font">Ghibli Park Itinerary Builder</h1>
+    </div>
 
-  <!-- Bootstrap JS Bundle: needed for accordion behavior -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-  </script>
+    <div class="row justify-content-center">
+      <div class="col-12 col-lg-8">
+        <form @submit.prevent="submitForm" novalidate>
+          <div class="accordion ghibli-accordion" id="mainAccordion">
+            
+            <!-- Panel 1: Personal Details -->
+            <div class="accordion-item ghibli-panel">
+              <h2 class="accordion-header" id="head-1">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panel-1" aria-expanded="false" aria-controls="panel-1">
+                  Personal Details
+                </button>
+              </h2>
+              <div id="panel-1" class="accordion-collapse collapse" aria-labelledby="head-1" data-bs-parent="#mainAccordion">
+                <div class="accordion-body ghibli-body">
+                  <div class="row">
+                    <div class="col-sm-4 mb-3">
+                      <label class="form-label custom-label">Full Name</label>
+                      <input type="text" class="form-control custom-input" v-model="userData.fullName">
+                      <span class="error-msg" v-if="formErrors.fullName">{{ formErrors.fullName }}</span>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                      <label class="form-label custom-label">Date of Birth</label>
+                      <input type="date" class="form-control custom-input" v-model="userData.birthDate">
+                      <span class="error-msg" v-if="formErrors.birthDate">{{ formErrors.birthDate }}</span>
+                    </div>
+                    <div class="col-sm-4 mb-3">
+                      <label class="form-label custom-label">Gender</label>
+                      <div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" value="Male" v-model="userData.genderSelect">
+                          <label class="form-check-label">Male</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input" type="radio" value="Female" v-model="userData.genderSelect">
+                          <label class="form-check-label">Female</label>
+                        </div>
+                      </div>
+                      <span class="error-msg" v-if="formErrors.genderSelect">{{ formErrors.genderSelect }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  <script>
-  
-  </script>
+            <!-- Panel 2: Park Selection -->
+            <div class="accordion-item ghibli-panel">
+              <h2 class="accordion-header" id="head-2">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panel-2" aria-expanded="false" aria-controls="panel-2">
+                  Ghibli Park Selection
+                </button>
+              </h2>
+              <div id="panel-2" class="accordion-collapse collapse" aria-labelledby="head-2" data-bs-parent="#mainAccordion">
+                <div class="accordion-body ghibli-body">
+                  <div v-if="fetchingData" class="text-center my-3">
+                    <div class="spinner-border text-success" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                  <div v-else-if="fetchError" class="alert alert-danger">
+                    {{ fetchError }}
+                  </div>
+                  <div v-else>
+                    <p class="mb-3 text-muted" style="font-size: 0.9rem;">Click a place to select it. Click it again to deselect it.</p>
+                    
+                    <div class="alert-pink mb-3" v-if="formErrors.chosenAttractions">
+                      Please select at least one Ghibli Park place.
+                    </div>
 
+                    <div class="row row-cols-1 row-cols-md-3 g-3">
+                      <div class="col" v-for="item in attractions" :key="item.id">
+                        <div class="card h-100 ghibli-card" 
+                             :class="{ 'card-active': chosenAttractions.some(x => x.id === item.id) }"
+                             @click="handleCardClick(item)">
+                          <img :src="item.image" class="card-img-top object-fit-cover" alt="Image" style="height: 180px;">
+                          <div class="card-body p-3">
+                            <h6 class="card-title fw-bold">{{ item.name }}</h6>
+                            <p class="card-text txt-desc">{{ item.description }}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 3: Visitors Details -->
+            <div class="accordion-item ghibli-panel">
+              <h2 class="accordion-header" id="head-3">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panel-3" aria-expanded="false" aria-controls="panel-3">
+                  Visitors Details
+                </button>
+              </h2>
+              <div id="panel-3" class="accordion-collapse collapse" aria-labelledby="head-3" data-bs-parent="#mainAccordion">
+                <div class="accordion-body ghibli-body">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label custom-label">Total Visitors</label>
+                      <input type="number" class="form-control custom-input" min="1" v-model="userData.totalGuests">
+                      <span class="error-msg" v-if="formErrors.totalGuests">{{ formErrors.totalGuests }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label custom-label">Number of Children</label>
+                      <input type="number" class="form-control custom-input" min="0" v-model="userData.kidsCount">
+                      <span class="error-msg" v-if="formErrors.kidsCount">{{ formErrors.kidsCount }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 4: Accommodation -->
+            <div class="accordion-item ghibli-panel">
+              <h2 class="accordion-header" id="head-4">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panel-4" aria-expanded="false" aria-controls="panel-4">
+                  Accommodation
+                </button>
+              </h2>
+              <div id="panel-4" class="accordion-collapse collapse" aria-labelledby="head-4" data-bs-parent="#mainAccordion">
+                <div class="accordion-body ghibli-body">
+                  <div class="mb-3">
+                      <select class="form-select custom-input" v-model="userData.lodging">
+                        <option value="" disabled>-- Choose accommodation --</option>
+                        <option v-for="(choice, i) in lodgingChoices" :key="i" :value="choice">
+                          {{ choice }}
+                        </option>
+                      </select>
+                      <span class="error-msg" v-if="formErrors.lodging">{{ formErrors.lodging }}</span>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 5: Payment Details -->
+            <div class="accordion-item ghibli-panel">
+              <h2 class="accordion-header" id="head-5">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panel-5" aria-expanded="false" aria-controls="panel-5">
+                  Payment Details
+                </button>
+              </h2>
+              <div id="panel-5" class="accordion-collapse collapse" aria-labelledby="head-5" data-bs-parent="#mainAccordion">
+                <div class="accordion-body ghibli-body">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label custom-label">Name on Card</label>
+                      <input type="text" class="form-control custom-input" v-model="userData.cardName">
+                      <span class="error-msg" v-if="formErrors.cardName">{{ formErrors.cardName }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label custom-label">Card Number</label>
+                      <input type="text" class="form-control custom-input" v-model="userData.cardNum">
+                      <span class="error-msg" v-if="formErrors.cardNum">{{ formErrors.cardNum }}</span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label custom-label">Expiration Date</label>
+                      <input type="month" class="form-control custom-input" v-model="userData.expDate">
+                      <span class="error-msg" v-if="formErrors.expDate">{{ formErrors.expDate }}</span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label custom-label">CVC</label>
+                      <input type="password" class="form-control custom-input" v-model="userData.securityCode">
+                      <span class="error-msg" v-if="formErrors.securityCode">{{ formErrors.securityCode }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Submit Button -->
+          <div class="text-center mt-4">
+            <button type="submit" class="btn action-btn px-5">Generate Itinerary</button>
+          </div>
+
+          <!-- Global Error -->
+          <div v-if="mainError" class="alert-pink mt-4 text-center">
+            {{ mainError }}
+          </div>
+        </form>
+
+        <!-- Summary Section -->
+        <div v-if="isSummaryVisible" class="card mt-5 border-0 shadow-sm summary-card">
+          <div class="card-header bg-transparent border-0 pt-4 pb-0">
+            <h3 class="mb-0 text-success fw-bold">Your Ghibli Park Itinerary</h3>
+          </div>
+          <div class="card-body px-4 pb-4">
+            <h6 class="fw-bold mb-1">Personal Details</h6>
+            <p class="mb-1 summary-txt"><strong>Name:</strong> {{ userData.fullName }}</p>
+            <p class="mb-1 summary-txt"><strong>Gender:</strong> {{ userData.genderSelect }}</p>
+            <p class="mb-3 summary-txt"><strong>Date of Birth:</strong> {{ userData.birthDate }}</p>
+
+            <h6 class="fw-bold mb-1">Selected Park Places</h6>
+            <ul class="list-unstyled mb-3 ms-3 summary-txt">
+              <li v-for="item in chosenAttractions" :key="item.id">
+                • {{ item.name }}
+              </li>
+            </ul>
+
+            <h6 class="fw-bold mb-1">Visitors Details</h6>
+            <p class="mb-1 summary-txt"><strong>Total Visitors:</strong> {{ userData.totalGuests }}</p>
+            <p class="mb-3 summary-txt"><strong>Children:</strong> {{ userData.kidsCount }}</p>
+
+            <h6 class="fw-bold mb-1">Accommodation</h6>
+            <p class="mb-3 summary-txt"><strong>Selected Option:</strong> {{ userData.lodging }}</p>
+
+            <h6 class="fw-bold mb-1">Payment Details</h6>
+            <p class="mb-1 summary-txt"><strong>Name on Card:</strong> {{ userData.cardName }}</p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
 </body>
-
 </html>
